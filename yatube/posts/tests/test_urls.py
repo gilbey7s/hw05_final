@@ -45,7 +45,8 @@ class PostsUrlsTests(TestCase):
         }
 
         self.urls_redirect_post_non_author = {
-            f"/posts/{PostsUrlsTests.post.id}/edit/": f"/posts/{PostsUrlsTests.post.id}/",
+            f"/posts/{PostsUrlsTests.post.id}/edit/":
+                f"/posts/{PostsUrlsTests.post.id}/",
         }
 
         self.templates = {
@@ -58,7 +59,8 @@ class PostsUrlsTests(TestCase):
         }
 
         self.urls_redirect = {
-            f"/posts/{PostsUrlsTests.post.id}/edit/": f"/auth/login/?next=/posts/{PostsUrlsTests.post.id}/edit/",
+            f"/posts/{PostsUrlsTests.post.id}/edit/":
+                f"/auth/login/?next=/posts/{PostsUrlsTests.post.id}/edit/",
             "/create/": "/auth/login/?next=/create/",
         }
 
