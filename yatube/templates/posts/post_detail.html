@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}
+  {{ title|truncatechars:30}}
+{% endblock %}
+{% load thumbnail %}
+{% block content %}
+  {% include 'includes/card_post.html' %}
+  {% include 'includes/comments.html' %}
+{% endblock %}
