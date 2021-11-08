@@ -52,11 +52,11 @@ def profile(request, username):
     following = (
         request.user.is_authenticated
         and Follow.objects.filter(
-            user=request.user, author__username=username
+            user=request.user, author=author
         ).exists()
     )
-    followers_count = author.following.all().count()
-    following_count = author.follower.all().count()
+    followers_count = author.following.count()
+    following_count = author.follower.count()
     context = {
         "title": title,
         "page_obj": page_obj,
@@ -75,7 +75,7 @@ def post_detail(request, post_id):
     title = post.text
     counter_posts = post.author.posts.count()
     form = CommentForm()
-    comments = Comment.objects.filter(post=post)
+    comments = post.comments.all()
     context = {
         "title": title,
         "post": post,

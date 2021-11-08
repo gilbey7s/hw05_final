@@ -10,7 +10,7 @@
     <ul class="list-group list-group-flush">
         <li class="list-group-item">
             <div class="h6 text-muted">
-                Подписчиков: {{followers_count}} <br/> Подписан: {{following_count}}
+                Подписчиков: {{ followers_count }} <br/> Подписан: {{ following_count }}
             </div>
         </li>
         <li class="list-group-item">
@@ -20,14 +20,18 @@
         </li>
     </ul>
     <li class="list-group-item">
-        {% if author.username == user.username%}
-            <a class="btn btn-info" href="{% url 'posts:follow_index' %}" role="button">Почитать любимых авторов</a>
-        {% else %}
-            {% if following %}
-                <a class="btn btn-danger" href="{% url 'posts:profile_unfollow' author.username %}" role="button">Отписаться</a> 
+        {% if user.is_authenticated %}
+            {% if author == user %}
+                <a class="btn btn-info" href="{% url 'posts:follow_index' %}" role="button">Почитать любимых авторов</a>
             {% else %}
-                <a class="btn btn-success" href="{% url 'posts:profile_follow' author.username %}" role="button">Подписаться</a> 
+                {% if following %}
+                    <a class="btn btn-danger" href="{% url 'posts:profile_unfollow' author.username %}" role="button">Отписаться</a> 
+                {% else %}
+                    <a class="btn btn-success" href="{% url 'posts:profile_follow' author.username %}" role="button">Подписаться</a> 
+                {% endif %}
             {% endif %}
+        {% else %}
+            <a class="btn btn-warning" href="{% url 'users:login' %}"> Авторизуйтесь, чтобы оформить подписку</a>
         {% endif %}
     </li>
 </div>

@@ -16,7 +16,7 @@
           <a class="btn btn-sm text-muted" href="{% url 'posts:post_edit' post.id %}" role="button">Редактировать</a>
         {% endif %}
         {% if post.group %}   
-          <a class="btn btn-sm text-muted" href="{% url 'posts:group_posts' post.group.slug %}" role="button">Записи группы: {{post.group}}</a>
+          <a class="btn btn-sm text-muted" href="{% url 'posts:group_posts' post.group.slug %}" role="button">Записи группы: {{ post.group }}</a>
         {% endif %}
       </div>
       <small class="text-muted">{{ post.pub_date|date:"d M Y" }}</small>

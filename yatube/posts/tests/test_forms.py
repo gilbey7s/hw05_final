@@ -6,7 +6,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from posts.models import Group, Post, User
+from posts.models import Group, Post, Comment, User
+from posts.forms import CommentForm
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
@@ -16,14 +17,26 @@ class PostFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.user = User.objects.create_user(username="user")
         cls.group = Group.objects.create(
             title="Тестовая группа", description="Тест", slug="test-group"
         )
+        cls.post = Post.objects.create(
+            text='Текст',
+            author=cls.user,
+            group=cls.group
+        )
+        cls.comment = {
+            'text': 'Комментарий'
+        }
+        cls.comment_second = {
+            'text': 'Еще комментарий'
+        }
 
     def setUp(self):
-        self.user = User.objects.create_user(username="user")
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
+        self.authorized_client.force_login(PostFormTests.user)
+        self.guest_client = Client()
 
     @classmethod
     def tearDownClass(cls):
@@ -66,6 +79,7 @@ class PostFormTests(TestCase):
                 text=form_data["text"],
                 group=PostFormTests.group.id,
                 author=self.user,
+                image='posts/small.gif'
             ).exists()
         )
 
@@ -85,3 +99,66 @@ class PostFormTests(TestCase):
         )
         post.refresh_from_db()
         self.assertEqual(post.text, edit_post_data["text"])
+
+
+class CommentFormTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='user')
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test-group',
+            description='Тестовое описание',
+        )
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовый текст',
+            group=cls.group
+        )
+        cls.comment = Comment.objects.create(
+            author=cls.user,
+            text='Тестовый комментарий',
+            post=cls.post
+        )
+        cls.form = CommentForm()
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
+    def test_add_comment(self):
+        """Форма комментария создает запись."""
+        comment_count = Comment.objects.count()
+        form_data = {
+            'text': 'Тестовый комментарий',
+        }
+        response = self.authorized_client.post(
+            reverse('posts:add_comment', args=[self.post.id]),
+            data=form_data,
+            follow=True,
+        )
+        self.assertRedirects(
+            response, reverse('posts:post_detail', args=[self.post.id]))
+        self.assertEqual(Comment.objects.count(), comment_count + 1)
+        self.assertTrue(
+            Comment.objects.filter(
+                text='Тестовый комментарий',
+            ).exists()
+        )
+
+    def test_comment_guest_client(self):
+        """Гость не может комментировать посты."""
+        url = f'/auth/login/?next=/posts/{CommentFormTests.post.id}/comment/'
+        comment_count = Comment.objects.count()
+        form_data = {
+            'text': 'Тестовый комментарий',
+        }
+        response = self.guest_client.post(
+            reverse('posts:add_comment', args=[self.post.id]),
+            data=form_data,
+            follow=True,
+        )
+        self.assertEqual(Comment.objects.count(), comment_count)
+        self.assertRedirects(response, url)

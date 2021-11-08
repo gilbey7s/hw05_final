@@ -3,7 +3,7 @@
   {{ title }}
 {% endblock %}
 {% block content %}
-  {% include 'includes/switcher.html' %}
+  {% include 'includes/switcher.html' with index=True %}
   {% load cache %}
 {% cache 20 index_page %}
   {% for post in page_obj %}
