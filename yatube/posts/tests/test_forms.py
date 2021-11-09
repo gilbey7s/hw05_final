@@ -26,12 +26,7 @@ class PostFormTests(TestCase):
             author=cls.user,
             group=cls.group
         )
-        cls.comment = {
-            'text': 'Комментарий'
-        }
-        cls.comment_second = {
-            'text': 'Еще комментарий'
-        }
+        
 
     def setUp(self):
         self.authorized_client = Client()
