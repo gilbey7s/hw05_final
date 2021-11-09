@@ -7,7 +7,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from posts.models import Group, Post, Comment, User
-from posts.forms import CommentForm
+
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
@@ -116,12 +116,6 @@ class CommentFormTests(TestCase):
             text='Тестовый текст',
             group=cls.group
         )
-        cls.comment = Comment.objects.create(
-            author=cls.user,
-            text='Тестовый комментарий',
-            post=cls.post
-        )
-        cls.form = CommentForm()
 
     def setUp(self):
         self.guest_client = Client()
@@ -144,7 +138,7 @@ class CommentFormTests(TestCase):
         self.assertEqual(Comment.objects.count(), comment_count + 1)
         self.assertTrue(
             Comment.objects.filter(
-                text='Тестовый комментарий',
+                text='Тестовый комментарий', post=CommentFormTests.post.id
             ).exists()
         )
 
