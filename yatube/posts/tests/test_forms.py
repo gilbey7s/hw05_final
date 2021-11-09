@@ -26,7 +26,6 @@ class PostFormTests(TestCase):
             author=cls.user,
             group=cls.group
         )
-        
 
     def setUp(self):
         self.authorized_client = Client()
